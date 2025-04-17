@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Авторизація</title>
+</head>
+<body>
+    <h2>Вхід в систему</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Увійти</button>
+    </form>
+    <p>Ще не зареєстровані? <a href="{% url 'polls:register' %}">Зареєструватися</a></p>
+</body>
+</html>

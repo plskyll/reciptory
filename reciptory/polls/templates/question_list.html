@@ -1,23 +1,32 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <title>Опитування</title>
-    </head>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Опитування</title>
+</head>
 <body>
-    <div>
     <h1>Список питань</h1>
+
+    {% if user.is_authenticated %}
+        <p>Привіт, {{ user.username }}! Ви авторизовані.</p>
+        <a href="{% url 'polls:logout' %}">Вийти</a>
+    {% else %}
+        <p>Будь ласка, увійдіть, щоб побачити більше інформації.</p>
+        <a href="{% url 'polls:login' %}">Увійти</a>
+    {% endif %}
+
     {% if questions %}
         <ul>
-        {% for question in questions %}
-            <li>
-                <h1>{{ question.question_text }}</h1>
-                <p>Опубліковано: {{ question.pub_date }}</p>
-            </li>
-        {% endfor %}
+            {% for question in questions %}
+                <li>
+                    <h2>{{ question.question_text }}</h2>
+                    <p>Опубліковано: {{ question.pub_date|date:"Y-m-d" }}</p>
+                </li>
+            {% endfor %}
         </ul>
     {% else %}
         <p>Питань поки немає.</p>
     {% endif %}
-    </div>
 </body>
 </html>

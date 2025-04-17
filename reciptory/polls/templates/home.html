@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мій сайт</title>
+</head>
+<body>
+    <h1>Ласкаво просимо до нашого сайту!</h1>
+
+    {% if user.is_authenticated %}
+        <p>Вітаємо, {{ user.username }}!</p>
+        <a href="{% url 'polls:logout' %}">Вийти</a>
+    {% else %}
+        <p>Будь ласка, <a href="{% url 'polls:login' %}">увійдіть</a> або <a href="{% url 'polls:register' %}">зареєструйтесь</a>.</p>
+    {% endif %}
+
+    <hr>
+    <a href="{% url 'polls:question_list' %}">Переглянути запитання</a>
+</body>
+</html>
