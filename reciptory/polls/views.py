@@ -1,8 +1,16 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import login
 from .forms import RegistrationForm
+from .models import Question
+
 
 # Create your views here.
+def question_list(request):
+    objects = Question.objects.all()
+    context = {'questions': objects}
+    return render(request, 'question_list.html', context)
+
+
 def register_view(request):
     if request.method == "POST":
         form = RegistrationForm(request.POST)
