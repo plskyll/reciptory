@@ -17,7 +17,10 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
+from polls.views import QuestionListView
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('polls.urls')),
+    path('api/questions/', QuestionListView.as_view(), name='questions-api'),
 ]
