@@ -1,21 +1,68 @@
-<!DOCTYPE html>
-<html lang="uk">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Мій сайт</title>
-</head>
-<body>
-    <h1>Ласкаво просимо до нашого сайту!</h1>
+{% extends 'base.html' %}
+{% load static %}
 
-    {% if user.is_authenticated %}
-        <p>Вітаємо, {{ user.username }}!</p>
-        <a href="{% url 'polls:logout' %}">Вийти</a>
+{% block content %}
+<style>
+  .recipe-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* 2 картки в рядку */
+    gap: 20px;
+    margin-top: 15px;
+  }
+  .recipe-card {
+    background: #fff;
+    border-radius: 10px;
+    padding: 15px 20px;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+    transition: box-shadow 0.3s ease;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .recipe-card:hover {
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+  }
+  .recipe-info {
+    flex-grow: 1;
+    padding-right: 20px;
+  }
+  .recipe-image {
+    width: 120px;
+    flex-shrink: 0;
+  }
+  .recipe-image img {
+    width: 100%;
+    border-radius: 8px;
+    object-fit: cover;
+  }
+</style>
+
+<div>
+    <h2>Нові рецепти</h2>
+    {% if latest_recipes %}
+        <div class="recipe-grid">
+            {% for recipe in latest_recipes %}
+                <div class="recipe-card">
+                    <div class="recipe-info">
+                        <h3><a href="{% url 'polls:recipe_detail' recipe_id=recipe.id %}">{{ recipe.title }}</a></h3>
+                        <p>Кухня: {{ recipe.get_cuisine_display }}</p>
+                        <p>Час приготування: {{ recipe.cooking_time }} хв</p>
+                        <p>Автор: {{ recipe.author.username }}</p>
+                        <a class="details-link" href="{% url 'polls:recipe_detail' recipe_id=recipe.id %}">Детальніше →</a>
+                    </div>
+                    <div class="recipe-image">
+                        {% if recipe.image %}
+                            <img src="{{ recipe.image.url }}" alt="Фото рецепту {{ recipe.title }}">
+                        {% else %}
+                            <img src="{% static 'images/no_image_available.png' %}" alt="Фото відсутнє">
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
     {% else %}
-        <p>Будь ласка, <a href="{% url 'polls:login' %}">увійдіть</a> або <a href="{% url 'polls:register' %}">зареєструйтесь</a>.</p>
+        <p>Поки що рецептів немає. Будьте першим, хто додасть рецепт!</p>
     {% endif %}
-
-    <hr>
-    <a href="{% url 'polls:question_list' %}">Переглянути запитання</a>
-</body>
-</html>
+</div>
+{% endblock %}

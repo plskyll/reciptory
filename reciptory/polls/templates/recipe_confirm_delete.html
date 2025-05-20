@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}Підтвердження видалення | {{ recipe.title }}{% endblock %}
+
+{% block content %}
+    <h1>Видалення рецепту: "{{ recipe.title }}"</h1>
+
+    <p>Ви впевнені, що хочете видалити цей рецепт? Цю дію неможливо буде скасувати.</p>
+
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" style="background-color: #e74c3c; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer;">
+            Так, видалити
+        </button>
+        <a href="{% url 'polls:recipe_detail' recipe.id %}" style="margin-left: 20px;">
+            <button type="button" style="padding: 10px 20px; border: 1px solid #ccc; border-radius: 4px; cursor: pointer;">
+                Скасувати
+            </button>
+        </a>
+    </form>
+{% endblock %}

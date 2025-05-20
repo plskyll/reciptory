@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% block content %}
+<style>
+    h2 {
+        text-align: center;
+        margin-bottom: 25px;
+        font-family: Arial, sans-serif;
+        color: #2980b9; /* Темно-синій */
+        font-weight: 700;
+        letter-spacing: 1px;
+    }
+    table {
+        width: 90%;
+        max-width: 900px;
+        margin: 0 auto 40px auto;
+        border-collapse: separate;
+        border-spacing: 0 10px;
+        font-family: Arial, sans-serif;
+        box-shadow: 0 4px 12px rgba(41, 128, 185, 0.15);
+        background: #f0f8ff; /* Дуже світло-блакитний фон таблиці */
+        border-radius: 8px;
+        overflow: hidden;
+    }
+    thead tr {
+        background-color: #3498db; /* Яскраво-синій */
+        color: white;
+        text-align: left;
+        font-weight: 600;
+        font-size: 16px;
+    }
+    thead th {
+        padding: 14px 20px;
+    }
+    tbody tr {
+        background: white;
+        box-shadow: 0 1px 4px rgba(41, 128, 185, 0.1);
+        transition: transform 0.25s ease, box-shadow 0.25s ease;
+        cursor: default;
+    }
+    tbody tr:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(41, 128, 185, 0.25);
+    }
+    tbody td {
+        padding: 12px 20px;
+        color: #2c3e50;
+        font-size: 15px;
+        vertical-align: middle;
+    }
+    a {
+        color: #2980b9;
+        text-decoration: none;
+        font-weight: 600;
+        margin: 0 8px;
+        transition: color 0.3s ease;
+    }
+    a:hover {
+        color: #1c5980;
+        text-decoration: underline;
+    }
+    .no-recipes {
+        text-align: center;
+        padding: 30px 0;
+        color: #7f8c8d;
+        font-style: italic;
+        font-size: 16px;
+    }
+</style>
+
+<h2>Керування рецептами</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Назва</th>
+            <th>Автор</th>
+            <th>Дії</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for recipe in recipes %}
+        <tr>
+            <td>{{ recipe.title }}</td>
+            <td>{{ recipe.author.username }}</td>
+            <td>
+                <a href="{% url 'polls:recipe_edit' recipe.id %}">Редагувати</a> |
+                <a href="{% url 'polls:recipe_delete' recipe.id %}">Видалити</a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="3" class="no-recipes">Рецептів немає</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

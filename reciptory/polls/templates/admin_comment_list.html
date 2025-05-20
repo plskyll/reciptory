@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% block content %}
+<style>
+    h2 {
+        text-align: center;
+        margin-bottom: 25px;
+        font-family: Arial, sans-serif;
+        color: #2980b9;
+        font-weight: 700;
+        letter-spacing: 1px;
+    }
+    table {
+        width: 90%;
+        max-width: 900px;
+        margin: 0 auto 40px auto;
+        border-collapse: separate;
+        border-spacing: 0 10px;
+        font-family: Arial, sans-serif;
+        box-shadow: 0 4px 12px rgba(41, 128, 185, 0.15);
+        background: #f0f8ff;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+    thead tr {
+        background-color: #3498db;
+        color: white;
+        text-align: left;
+        font-weight: 600;
+        font-size: 16px;
+    }
+    thead th {
+        padding: 14px 20px;
+    }
+    tbody tr {
+        background: white;
+        box-shadow: 0 1px 4px rgba(41, 128, 185, 0.1);
+        transition: transform 0.25s ease, box-shadow 0.25s ease;
+        cursor: default;
+    }
+    tbody tr:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(41, 128, 185, 0.25);
+    }
+    tbody td {
+        padding: 12px 20px;
+        color: #2c3e50;
+        font-size: 15px;
+        vertical-align: middle;
+        word-break: break-word;
+        max-width: 400px;
+    }
+    a {
+        color: #2980b9;
+        text-decoration: none;
+        font-weight: 600;
+        margin: 0 8px;
+        transition: color 0.3s ease;
+    }
+    a:hover {
+        color: #1c5980;
+        text-decoration: underline;
+    }
+    .no-comments {
+        text-align: center;
+        padding: 30px 0;
+        color: #7f8c8d;
+        font-style: italic;
+        font-size: 16px;
+    }
+</style>
+
+<h2>Керування коментарями</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Автор</th>
+            <th>Текст</th>
+            <th>Дата</th>
+            <th>Дії</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for comment in comments %}
+        <tr>
+            <td>{{ comment.author.username }}</td>
+            <td>{{ comment.text }}</td>
+            <td>{{ comment.created_at }}</td>
+            <td>
+                <a href="{% url 'polls:admin_comment_delete' comment.id %}">Видалити</a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="4" class="no-comments">Коментарів немає</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

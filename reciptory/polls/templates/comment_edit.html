@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}Редагувати коментар{% endblock %}
+
+{% block content %}
+<h2>Редагувати коментар</h2>
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" style="background-color:#3498db; color:white; border:none; padding:8px 15px; border-radius:4px; cursor:pointer;">
+        Зберегти
+    </button>
+    <a href="{% url 'polls:recipe_detail' comment.recipe.id %}">Скасувати</a>
+</form>
+{% endblock %}

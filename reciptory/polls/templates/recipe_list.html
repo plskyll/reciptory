@@ -1,0 +1,351 @@
+{% extends "base.html" %}
+{% block title %}Список рецептів - reciptory{% endblock %}
+{% block content %}
+<h1>Список рецептів</h1>
+<div class="filters">
+    <form method="get" action="{% url 'polls:recipe_list' %}">
+        <div class="filters-row">
+            <div class="filter-item">
+                <label for="search">Пошук:</label>
+                <input type="text" id="search" name="query" placeholder="Назва або інгредієнт" value="{{ request.GET.query }}">
+            </div>
+            <div class="filter-item">
+                <label for="cuisine">Кухня:</label>
+                <select id="cuisine" name="cuisine">
+                    <option value="">Усі кухні</option>
+                    {% for cuisine in cuisines %}
+                        <option value="{{ cuisine.id }}" {% if request.GET.cuisine == cuisine.id|stringformat:"s" %}selected{% endif %}>{{ cuisine.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="filter-item filter-button">
+                <button type="submit">Фільтрувати</button>
+            </div>
+        </div>
+    </form>
+</div>
+{% if recipes %}
+<div class="recipe-grid">
+{% for recipe in recipes %}
+<div class="recipe-card" data-href="{% url 'polls:recipe_detail' recipe.id %}">
+{% if recipe.image %}
+<div class="recipe-photo" style="background-image: url('{{ recipe.image.url }}');"></div>
+{% else %}
+<div class="recipe-photo placeholder">Фото відсутнє</div>
+{% endif %}
+            <div class="recipe-content">
+                <h3><a href="{% url 'polls:recipe_detail' recipe.id %}">{{ recipe.title }}</a></h3>
+                <p><strong>Кухня:</strong> {{ recipe.get_cuisine_display }}</p>
+                <p><strong>Час приготування:</strong> {{ recipe.cooking_time }} хв.</p>
+                <p><strong>Складність:</strong>
+                    {% if recipe.difficulty == 'easy' %}Легкий
+                    {% elif recipe.difficulty == 'medium' %}Середній
+                    {% elif recipe.difficulty == 'hard' %}Складний
+                    {% endif %}
+                </p>
+                <p><strong>Автор:</strong> {{ recipe.author.username }}</p>
+                <p>{{ recipe.description|truncatewords:20 }}</p>
+
+                <div class="recipe-actions">
+                    <a href="{% url 'polls:recipe_detail' recipe.id %}" class="details-link">Детальніше</a>
+
+                    {% if user.is_authenticated %}
+                        <form method="post" action="{% url 'polls:toggle_favorite' recipe.id %}" class="favorite-form" data-recipe-id="{{ recipe.id }}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn-favorite {% if recipe in user_favorites %}active{% endif %}" aria-label="{% if recipe in user_favorites %}Видалити з обраних{% else %}Додати до обраних{% endif %}">
+                                {% if recipe in user_favorites %}
+                                    &#9733;
+                                {% else %}
+                                    &#9734;
+                                {% endif %}
+                            </button>
+                        </form>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+</div>  {# кінець recipe-grid #}
+{% else %}
+<p class="info">Жодного рецепту не знайдено. Спробуйте змінити критерії пошуку або <a href="{% url 'polls:recipe_create' %}">створіть новий рецепт</a>.</p>
+{% endif %}
+<style>
+/* Загальний стиль */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #333;
+    background-color: #fefefe;
+}
+
+/* Фільтри */
+.filters {
+    margin-bottom: 30px;
+}
+.filters-row {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    justify-content: center;  /* Вирівнювання по центру */
+}
+.filter-item {
+    flex: 1;
+    min-width: 180px;
+    display: flex;
+    flex-direction: column;
+}
+.filter-item label {
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: #444;
+}
+.filter-item input[type="text"],
+.filter-item select {
+    padding: 10px 14px;
+    border: 1.8px solid #ddd;
+    border-radius: 8px;
+    font-size: 15px;
+    transition: border-color 0.3s ease;
+}
+.filter-item input[type="text"]:focus,
+.filter-item select:focus {
+    border-color: #2196f3; /* яскравий блакитний */
+    outline: none;
+}
+.filter-button {
+    display: flex;
+    align-items: flex-end;
+}
+.filter-button button {
+    background: linear-gradient(45deg, #2196f3, #64b5f6);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    font-weight: 700;
+    font-size: 16px;
+    border-radius: 10px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(33,150,243,0.5);
+    transition: box-shadow 0.3s ease, transform 0.2s ease;
+}
+.filter-button button:hover {
+    box-shadow: 0 6px 20px rgba(33,150,243,0.8);
+    transform: translateY(-2px);
+}
+
+/* Сітка рецептів */
+.recipe-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 30px;
+}
+
+/* Картка рецепту */
+.recipe-card {
+    background: white;
+    border-radius: 18px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    position: relative;
+    cursor: pointer;
+}
+.recipe-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 14px 35px rgba(0,0,0,0.15);
+}
+
+.recipe-photo {
+    width: 100%;
+    height: 200px; /* або інша висота */
+    background-size: cover;
+    background-position: center;
+    border-radius: 8px;
+}
+.recipe-photo.placeholder {
+    background: linear-gradient(135deg, #e0e0e0, #f0f0f0);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #aaa;
+    font-size: 18px;
+    font-style: italic;
+    height: 180px;
+    border-bottom: 3px solid #2196f3;
+}
+
+/* Контент в картці */
+.recipe-content {
+    padding: 22px 25px 25px 25px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+.recipe-content h3 {
+    margin: 0 0 14px 0;
+    font-size: 24px;
+    font-weight: 700;
+    color: #0d47a1;
+}
+.recipe-content h3 a {
+    text-decoration: none;
+    color: inherit;
+    transition: color 0.3s ease;
+}
+.recipe-content h3 a:hover {
+    color: #42a5f5;
+}
+
+.recipe-content p {
+    margin: 6px 0;
+    font-size: 15px;
+    line-height: 1.4;
+    color: #555;
+}
+
+/* Дії на картці */
+.recipe-actions {
+    margin-top: 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Вирівнюємо кнопки дій: посилання зліва, зірочка праворуч */
+.details-link {
+    text-decoration: none;
+    background-color: #2196f3;
+    color: white;
+    padding: 8px 18px;
+    font-weight: 600;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(33,150,243,0.5);
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+.details-link:hover {
+    background-color: #1565c0;
+    box-shadow: 0 6px 18px rgba(21,101,192,0.7);
+}
+
+/* Кнопка обране у вигляді зірочки ближче до правого краю */
+.favorite-form {
+    margin-left: 0;
+    margin-right: 15px;
+}
+.btn-favorite {
+    font-size: 46px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #bbb;
+    transition: color 0.3s ease;
+    padding: 0;
+    line-height: 1;
+    user-select: none;
+}
+.btn-favorite:hover {
+    color: #2196f3;
+}
+.btn-favorite.active {
+    color: #2196f3;
+    text-shadow: 0 0 6px #64b5f6;
+}
+
+/* Пагінація */
+.pagination {
+    margin-top: 40px;
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    font-weight: 600;
+    font-size: 17px;
+}
+.pagination a {
+    text-decoration: none;
+    color: #2196f3;
+    padding: 8px 18px;
+    border-radius: 10px;
+    background: #e3f2fd;
+    box-shadow: 0 4px 12px rgba(33,150,243,0.3);
+    transition: background 0.3s ease;
+}
+.pagination a:hover {
+    background: #bbdefb;
+}
+.pagination span {
+    display: flex;
+    align-items: center;
+    color: #333;
+}
+
+/* Інформаційні повідомлення */
+.info {
+    font-style: italic;
+    color: #777;
+    font-size: 18px;
+    margin-top: 60px;
+    text-align: center;
+}
+.info a {
+    color: #2196f3;
+    text-decoration: underline;
+    font-weight: 600;
+}
+.info a:hover {
+    color: #1565c0;
+}
+</style>
+<script>
+// Обробник для додавання/видалення улюблених
+document.querySelectorAll('.favorite-form').forEach(form => {
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const button = form.querySelector('button[type="submit"]');
+        const url = form.action;
+        const csrfToken = form.querySelector('[name=csrfmiddlewaretoken]').value;
+
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrfToken,
+                'X-Requested-With': 'XMLHttpRequest',
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if(data.is_favorite) {
+                button.innerHTML = '&#9733;'; // Залита зірочка
+                button.setAttribute('aria-label', 'Видалити з обраних');
+                button.classList.add('active');
+            } else {
+                button.innerHTML = '&#9734;'; // Порожня зірочка
+                button.setAttribute('aria-label', 'Додати до обраних');
+                button.classList.remove('active');
+            }
+        })
+        .catch(error => {
+            console.error('Помилка:', error);
+        });
+    });
+});
+
+// Обробник для переходу на сторінку деталей при кліку на картку
+document.querySelectorAll('.recipe-card').forEach(card => {
+  card.addEventListener('click', function(e) {
+    if (
+      e.target.closest('a') ||
+      e.target.closest('button') ||
+      e.target.closest('form')
+    ) {
+      return;
+    }
+    const href = card.getAttribute('data-href');
+    if (href) {
+      window.location.href = href;
+    }
+  });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+
+{% block title %}
+    {% if form.instance.id %}Редагувати рецепт{% else %}Створити новий рецепт{% endif %} | reciptory
+{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <h2>{% if form.instance.id %}Редагувати рецепт{% else %}Створити новий рецепт{% endif %}</h2>
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <div class="form-group">
+            <label for="id_title">Назва рецепту:</label>
+            {{ form.title }}
+            {% if form.title.errors %}
+                <div class="error-message">{{ form.title.errors }}</div>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label for="id_cuisine">Кухня:</label>
+            {{ form.cuisine }}
+            {% if form.cuisine.errors %}
+                <div class="error-message">{{ form.cuisine.errors }}</div>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label for="id_cooking_time">Час приготування (хв):</label>
+            {{ form.cooking_time }}
+            {% if form.cooking_time.errors %}
+                <div class="error-message">{{ form.cooking_time.errors }}</div>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label for="id_ingredients">Інгредієнти:</label>
+            {{ form.ingredients }}
+            <div class="help-text">Вкажіть кожен інгредієнт з нового рядка у форматі "кількість - назва" (наприклад, "200г - борошно")</div>
+            {% if form.ingredients.errors %}
+                <div class="error-message">{{ form.ingredients.errors }}</div>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label for="id_instructions">Інструкції:</label>
+            {{ form.instructions }}
+            <div class="help-text">Опишіть покроково процес приготування</div>
+            {% if form.instructions.errors %}
+                <div class="error-message">{{ form.instructions.errors }}</div>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label for="id_image">Зображення:</label>
+            {% if form.instance.image %}
+                <div class="current-image">
+                    <p>Поточне зображення: {{ form.instance.image.name }}</p>
+                </div>
+            {% endif %}
+            {{ form.image }}
+            <div class="help-text">Необов'язково. Завантажте зображення готової страви.</div>
+            {% if form.image.errors %}
+                <div class="error-message">{{ form.image.errors }}</div>
+            {% endif %}
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="submit-button">
+                {% if form.instance.id %}Зберегти зміни{% else %}Створити рецепт{% endif %}
+            </button>
+            <a href="{% url 'polls:recipe_list' %}" class="cancel-button">Скасувати</a>
+        </div>
+    </form>
+</div>
+
+<style>
+    /* Твої стилі залишаю без змін */
+    .form-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    .form-group {
+        margin-bottom: 20px;
+    }
+    label {
+        display: block;
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+    input[type="text"], input[type="number"], select, textarea {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 16px;
+    }
+    textarea {
+        min-height: 150px;
+    }
+    .help-text {
+        font-size: 14px;
+        color: #666;
+        margin-top: 5px;
+    }
+    .error-message {
+        color: #721c24;
+        background-color: #f8d7da;
+        padding: 5px 10px;
+        border-radius: 4px;
+        margin-top: 5px;
+    }
+    .form-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 20px;
+    }
+    .submit-button {
+        background: #3498db;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;
+    }
+    .submit-button:hover {
+        background: #2980b9;
+    }
+    .cancel-button {
+        background: #f1f1f1;
+        color: #333;
+        border: 1px solid #ddd;
+        padding: 10px 20px;
+        border-radius: 4px;
+        text-decoration: none;
+        text-align: center;
+        font-size: 16px;
+    }
+    .cancel-button:hover {
+        background: #e4e4e4;
+    }
+    .current-image {
+        margin-bottom: 10px;
+        font-style: italic;
+    }
+</style>
+{% endblock %}

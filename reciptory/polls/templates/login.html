@@ -1,17 +1,61 @@
-<!DOCTYPE html>
-<html lang="uk">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Авторизація</title>
-</head>
-<body>
-    <h2>Вхід в систему</h2>
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Увійти</button>
-    </form>
-    <p>Ще не зареєстровані? <a href="{% url 'polls:register' %}">Зареєструватися</a></p>
-</body>
-</html>
+{% extends "base.html" %}
+
+{% block title %}Вхід - reciptory{% endblock %}
+
+{% block content %}
+    <div class="auth-container" style="max-width: 500px; margin: 40px auto; padding: 20px; border: 1px solid #ddd; border-radius: 5px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+        <h1 style="text-align: center; margin-bottom: 30px;">Вхід на сайт</h1>
+        
+        {% if form.errors %}
+            <div class="error" style="margin-bottom: 20px;">
+                <p>Невірний логін або пароль. Спробуйте ще раз.</p>
+            </div>
+        {% endif %}
+        
+        <form method="post" action="{% url 'polls:login' %}">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label for="id_username">Ім'я користувача:</label>
+                <input type="text" name="username" id="id_username" required autofocus>
+            </div>
+            
+            <div class="form-group">
+                <label for="id_password">Пароль:</label>
+                <input type="password" name="password" id="id_password" required>
+            </div>
+            
+            <div class="form-group" style="display: flex; align-items: center; margin: 20px 0;">
+                <input type="checkbox" name="remember_me" id="id_remember_me" style="width: auto; margin-right: 10px;">
+                <label for="id_remember_me" style="margin-bottom: 0;">Запам'ятати мене</label>
+            </div>
+            
+            <input type="hidden" name="next" value="{{ next }}">
+            
+            <div class="form-actions" style="text-align: center;">
+                <button type="submit" style="width: 100%; padding: 12px; font-size: 16px; margin-bottom: 15px;">Увійти</button>
+                <p>Ще не маєте облікового запису? <a href="{% url 'polls:register' %}">Зареєструватися</a></p>
+                <p><a href="{% url 'polls:password_reset' %}">Забули пароль?</a></p>
+            </div>
+        </form>
+        
+        {% if SOCIAL_AUTH_ENABLED %}
+            <div class="social-auth" style="margin-top: 30px; border-top: 1px solid #ddd; padding-top: 20px; text-align: center;">
+                <h3>Вхід через соціальні мережі</h3>
+                <div style="display: flex; justify-content: center; gap: 15px; margin-top: 15px;">
+                    {% if 'google-oauth2' in backends.backends %}
+                    <a href="{% url 'social:begin' 'google-oauth2' %}" class="social-button" style="display: inline-block; padding: 10px 15px; background-color: #DB4437; color: white; border-radius: 4px; text-decoration: none;">
+                        Google
+                    </a>
+                    {% endif %}
+                    
+                    {% if 'facebook' in backends.backends %}
+                    <a href="{% url 'social:begin' 'facebook' %}" class="social-button" style="display: inline-block; padding: 10px 15px; background-color: #3b5998; color: white; border-radius: 4px; text-decoration: none;">
+                        Facebook
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}

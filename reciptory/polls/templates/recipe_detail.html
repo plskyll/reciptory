@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+
+{% block title %}{{ recipe.title }} | reciptory{% endblock %}
+
+{% block content %}
+<div class="recipe-detail">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h1>{{ recipe.title }}</h1>
+        <div class="recipe-actions">
+            {% if user.is_authenticated %}
+                <form style="display: inline;" method="post" action="{% url 'polls:toggle_favorite' recipe.id %}">
+                    {% csrf_token %}
+                    <button type="submit">
+                        {% if is_favorite %}
+                            Видалити з обраного
+                        {% else %}
+                            Додати до обраного
+                        {% endif %}
+                    </button>
+                </form>
+
+                {% if user == recipe.author %}
+                    <a href="{% url 'polls:recipe_edit' recipe.id %}" style="margin-left: 10px;">
+                        <button type="button">Редагувати</button>
+                    </a>
+                    <a href="{% url 'polls:recipe_delete' recipe.id %}" style="margin-left: 10px;">
+                        <button type="button" style="background-color: #e74c3c; color: white; border: none; padding: 8px 15px; border-radius: 4px;">
+                            Видалити
+                        </button>
+                    </a>
+                {% endif %}
+            {% endif %}
+        </div>
+    </div>
+
+    {% if recipe.image %}
+        <img src="{{ recipe.image.url }}" alt="Зображення рецепту" style="max-width: 100%; margin-bottom: 20px;">
+    {% endif %}
+
+    <p><strong>Кухня:</strong> {{ recipe.get_cuisine_display }}</p>
+    <p><strong>Час приготування:</strong> {{ recipe.cooking_time }} хв</p>
+
+    <h3>Інгредієнти</h3>
+    <ul>
+        {% for item in recipe.ingredients.splitlines %}
+            <li>{{ item }}</li>
+        {% endfor %}
+    </ul>
+
+    <h3>Інструкції</h3>
+    <p>{{ recipe.instructions|linebreaks }}</p>
+</div>
+
+<hr>
+
+<div class="comments-section" style="max-width: 800px; margin: 40px auto 0;">
+    <h2>Коментарі</h2>
+
+    {% for comment in comments %}
+        <div class="comment" style="border-bottom: 1px solid #ddd; padding: 10px 0;">
+            <p><strong>{{ comment.author.username }}</strong> — {{ comment.created_at|date:"d.m.Y H:i" }}</p>
+            <p>{{ comment.text|linebreaks }}</p>
+
+            {% if user == comment.author %}
+                <a href="{% url 'polls:comment_edit' comment.id %}">Редагувати</a> |
+                <a href="{% url 'polls:comment_delete' comment.id %}">Видалити</a>
+            {% endif %}
+        </div>
+    {% empty %}
+        <p>Ще немає коментарів. Будь першим!</p>
+    {% endfor %}
+
+    {% if user.is_authenticated %}
+        <h3>Додати коментар</h3>
+        <form method="post" action="">
+            {% csrf_token %}
+            {{ comment_form.as_p }}
+            <button type="submit" style="background-color:#3498db; color:white; border:none; padding:10px 15px; border-radius:4px; cursor:pointer;">Відправити</button>
+        </form>
+    {% else %}
+        <p>Щоб залишити коментар, будь ласка, <a href="{% url 'polls:login' %}">увійдіть</a>.</p>
+    {% endif %}
+</div>
+
+<style>
+    .recipe-detail {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    .recipe-actions button {
+        background-color: #3498db;
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+    }
+
+    .recipe-actions button:hover {
+        background-color: #2980b9;
+    }
+
+    .recipe-actions a button {
+        background-color: #f1c40f;
+        color: black;
+    }
+
+    .recipe-actions a:last-child button {
+        background-color: #e74c3c;
+        color: white;
+    }
+
+    img {
+        border-radius: 6px;
+    }
+
+    .comments-section {
+        font-family: Arial, sans-serif;
+    }
+
+    .comments-section h2, .comments-section h3 {
+        margin-bottom: 15px;
+    }
+
+    .comment a {
+        color: #3498db;
+        text-decoration: none;
+        margin-right: 10px;
+        font-size: 14px;
+    }
+
+    .comment a:hover {
+        text-decoration: underline;
+    }
+</style>
+{% endblock %}

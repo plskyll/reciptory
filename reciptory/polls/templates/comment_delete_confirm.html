@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block title %}Видалити коментар{% endblock %}
+
+{% block content %}
+<h2>Видалити коментар</h2>
+
+<p>Ви впевнені, що хочете видалити цей коментар?</p>
+<p><strong>{{ comment.text }}</strong></p>
+
+<form method="post">
+    {% csrf_token %}
+    <button type="submit" style="background-color:#e74c3c; color:white; border:none; padding:8px 15px; border-radius:4px; cursor:pointer;">
+        Видалити
+    </button>
+    <a href="{% url 'polls:recipe_detail' comment.recipe.id %}">Скасувати</a>
+</form>
+{% endblock %}
